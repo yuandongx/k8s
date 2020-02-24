@@ -1,0 +1,16 @@
+---
+- name: Give insecure permissions to an existing file
+  file:
+    path: "{{ bin_path_to }}"
+    owner: root
+    group: root
+    # mode: '1777'
+    state: directory
+
+- name:
+  copy:
+    src: "{{ bin_path_from }}/"
+    dest: "{{ bin_path_to }}/"
+    owner: root
+    group: root
+    mode: '0644'
