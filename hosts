@@ -1,0 +1,19 @@
+# This is the default ansible 'hosts' file.
+
+[k8s:vars]
+ansible_user=ubuntu
+ansible_password=admin@123
+ansible_become_password=admin@123
+#ansible_become_user=root
+#ansible_become_method=sudo
+ansible_connection=paramiko
+
+[k8s:children]
+master
+nodes
+
+[master]
+192.168.150.133
+
+[nodes]
+192.168.150.134
