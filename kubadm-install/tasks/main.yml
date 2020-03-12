@@ -1,7 +1,4 @@
 ---
 # tasks file for kubadm-install
 
-- name: debug
-  debug: msg="123"
-
 - { include: intsall-docker.yml, tags: ['docker']}

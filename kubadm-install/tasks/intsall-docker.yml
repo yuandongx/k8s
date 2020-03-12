@@ -1,7 +1,46 @@
-- name: apt update
-  apt:
-    update_cache: true
+---
+
+- name: docker info
+  shell: docker version
+  become: yes
+  register: docker_version
+  ignore_errors: true
+
+# - name: apt update
   # apt:
     # update_cache: true
-  # shell: mkdir test
-  become: yes
+  # become: yes
+
+- name: install
+  block:
+    - debug: msg="docker is not installed, try to install it."
+
+    - name: apt update
+      apt:
+        update_cache: true
+      become: yes
+
+    - name: install docker depend
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl 
+          - software-properties-common
+      become: yes
+
+    - name: add gpg
+      shell: curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
+      become: yes
+
+    - name: apt update
+      apt:
+        update_cache: true
+      become: yes
+
+    - name: install docker
+      apt:
+        name: docker.io
+      become: yes
+
+  when: '"docker: not found" in docker_version.stderr_lines[0]'
