@@ -6,13 +6,25 @@
   register: docker_version
   ignore_errors: true
 
-# - name: apt update
-  # apt:
-    # update_cache: true
-  # become: yes
+- name: apt update
+  set_fact:
+    docker_version_info: "{{ docker_version.stdout|regex_search('Version:\\s+(\\d+.\\d+.\\d+)')|regex_replace('Version:\\s+', '')}}"
+  when: docker_version.stdout != ""
 
 - name: install
   block:
+  
+    - name: plder version, remove!!!
+      apt:
+        name:
+          - docker
+          - docker-engine
+          - docker.io
+          - containerd runc
+        purge: true
+        state: absent
+      become: yes
+ 
     - debug: msg="docker is not installed, try to install it."
 
     - name: apt update
@@ -42,5 +54,4 @@
       apt:
         name: docker.io
       become: yes
-
-  when: '"docker: not found" in docker_version.stderr_lines[0]'
+  when: "docker_version_info is undefined or docker_version_info is version('19.03.6', operator='lt')"
