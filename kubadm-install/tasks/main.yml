@@ -1,4 +1,6 @@
 ---
 # tasks file for kubadm-install
 
-- { include: intsall-docker.yml, tags: ['docker']}
+# - { include: intsall-docker.yml, tags: ['docker']}
+# - { include: install-kube.yml, tags: ['k8s']}
+- { include: startup-kube.yml, tags: ['k8s']}

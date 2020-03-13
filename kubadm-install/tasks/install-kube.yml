@@ -1,0 +1,38 @@
+
+
+
+- name: ls kube-source.list
+  stat: path=/etc/apt/sources.list.d/kubernetes.list
+  register: sta
+  ignore_errors: true
+
+- name: backup kube-source.list
+  shell: cp /etc/apt/sources.list.d/kubernetes.list /etc/apt/sources.list.d/kubernetes.list.bak
+  become: yes
+  when: sta.stat.exists
+
+- name: add kubernetes mirrors
+  shell: echo "deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list
+  become: yes
+
+- block:
+  - name: install k8s
+    debug: msg="install k8s"
+
+  - name: add kubernetes gpg
+    shell: curl -fsSL https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add -
+    become: yes
+
+  - name: apt update
+    apt:
+      update_cache: yes
+    become: yes
+
+  - name: install kubeadm kubelet kubectl
+    apt:
+      name:
+        - kubeadm
+        - kubelet
+        - kubectl
+    become: yes
+
