@@ -1,0 +1,8 @@
+---
+# tasks file for kubadm-management
+- name: debug info
+  debug: msg="image_repository={{image_repository}} service_subnet={{service_subnet}} advertise_address={{advertise_address}}"
+
+- name: create default init config
+  template: src=kubeadm.conf.j2 dest=kubeadm.conf
+  delegate_to: api_server

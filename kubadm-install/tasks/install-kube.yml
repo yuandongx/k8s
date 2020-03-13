@@ -28,11 +28,16 @@
       update_cache: yes
     become: yes
 
-  - name: install kubeadm kubelet kubectl
+  - name: install kubelet kubectl kubeadm
     apt:
       name:
-        - kubeadm
         - kubelet
         - kubectl
-    become: yes
+
+  # - name: install kubeadm
+    # apt:
+      # name:
+        # - kubeadm
+    # delegate_to: api_server
+    # become: yes
 
