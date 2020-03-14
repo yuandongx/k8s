@@ -4,13 +4,12 @@
     path: "{{ bin_path_to }}"
     owner: root
     group: root
-    # mode: '1777'
     state: directory
 
 - name:
   copy:
     src: "{{ bin_path_from }}/"
-    dest: "{{ bin_path_to }}/"
+    dest: "/home/go/bin/"
     owner: root
     group: root
-    mode: '0644'
+    mode: '0655'

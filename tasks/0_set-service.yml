@@ -7,10 +7,28 @@
 
 - name: Set OS distribution dependent variables
   include_vars: kube-apiserver.yml
-  
-- name: debug
-  debug: msg={{ kube_apiserveradmission_control }}
 
+- name: Set OS distribution dependent variables
+  include_vars: kubelet.yml
+
+- name: Set OS distribution dependent variables
+  include_vars: kube-scheduler.yml
+
+- name: Set OS distribution dependent variables
+  include_vars: kube-proxy.yml
+
+- name: Set OS distribution dependent variables
+  include_vars: kube-controller-manager.yml
+
+- set_fact: apiserver_args="{% if apiserver_args is defined%}{% for key, value in apiserver_args.iteritems() %} --{{key|replace("_", "-")}}="{{value}}" {% endfor %}{% endif %}"
+
+- set_fact: kube_controller_manager_args="{% if kube_controller_manager_args is defined%}{% for key, value in kube_controller_manager_args.iteritems() %} --{{key|replace("_", "-")}}="{{value}}" {% endfor %}{% endif %}"
+
+- set_fact: kube_scheduler_args="{% if kube_scheduler_args is defined%}{% for key, value in kube_scheduler_args.iteritems() %} --{{key|replace("_", "-")}}="{{value}}" {% endfor %}{% endif %}"
+
+- set_fact: kube_proxy_args="{% if kube_proxy_args is defined%}{% for key, value in kube_proxy_args.iteritems() %} --{{key|replace("_", "-")}}="{{value}}" {% endfor %}{% endif %}"
+
+- set_fact: kubelet_args="{% if kubelet_args is defined%}{% for key, value in kubelet_args.iteritems() %} --{{key|replace("_", "-")}}="{{value}}" {% endfor %}{% endif %}"
 
 
 - name: make etcd service
@@ -18,7 +36,6 @@
   vars:
     description: etcd server
     after: network.service
-    wants: etcd.service
     work_directory: "{{ etcd_work_directory }}"
     execstart: "{{ bin_path_to }}/etcd"
 
@@ -31,7 +48,7 @@
     description: kube apiserver
     after: etcd.service
     wants: etcd.service
-    execstart: "{{ bin_path_to }}/kube-apiserver --etcd-servers={{ etcd_servers }} {{ apiserver_args}}"
+    execstart: "{{ bin_path_to }}/kube-apiserver {{ apiserver_args}}"
 
 
 - name: make kube-controller-manager service
@@ -42,7 +59,7 @@
     description: kube-controller-manager apiserver
     after: kube-apiserver.service
     requires: kube-apiserver.service
-    execstart: "{{ bin_path_to }}/kube-controller-manager --master={{ api_server }} {{ kube_controller_manager_args}}"
+    execstart: "{{ bin_path_to }}/kube-controller-manager {{ kube_controller_manager_args}}"
 
 
 - name: make kube-scheduler service
@@ -53,7 +70,7 @@
     description: kube-scheduler apiserver
     after: kube-apiserver.service
     requires: kube-apiserver.service
-    execstart: "{{ bin_path_to }}/kube-scheduler --master={{ api_server }} {{ kube_scheduler_args}}"
+    execstart: "{{ bin_path_to }}/kube-scheduler {{ kube_scheduler_args}}"
 
 
 - name: make kube-proxy service
@@ -64,7 +81,7 @@
     description: kube-proxy apiserver
     after: network.service
     requires: network.service
-    execstart: "{{ bin_path_to }}/kube-proxy --master={{ api_server }} {{ kube_proxy_args}}"
+    execstart: "{{ bin_path_to }}/kube-proxy {{ kube_proxy_args}}"
 
 
 - name: make kubelet service

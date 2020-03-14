@@ -1,0 +1,37 @@
+---
+
+- name: Restart service httpd, in all cases
+  delegate_to: localhost
+  service:
+    name: "{{item}}"
+    state: started
+  loop:
+    - etcd.service
+    - kube-apiserver.service
+    - kube-controller-manager.service
+    - kube-scheduler.service
+   
+
+- name: Set OS distribution dependent variables
+  include_vars: nodes.yml
+
+# - name: setup nodes
+  # block:
+- name: Add a host alias that we reach through a tunnel (Ansible 1.9 and older)
+  add_host:
+    groups: nodes
+    hostname: "{{item.value.hostname}}"
+    ansible_ssh_host: "{{item.value.ansible_ssh_host}}"
+    ansible_ssh_port: "{{item.value.ansible_ssh_port}}"
+    ansible_user: "{{item.value.ansible_user}}"
+    ansible_password: "{{item.value.ansible_password}}"
+  loop: "{{nodes|dict2items}}"
+
+- name: copy bin
+  delegate_to: 192.168.48.128
+  service:
+    name: "{{item}}"
+    state: started
+  loop:    
+    - kubelet
+    - kube-proxy

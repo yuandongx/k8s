@@ -2,9 +2,8 @@
 # tasks file for k8s
 # - { include: update-bin.yml, tags: ['update'] }
 # - { include: configure.yml, tags: ['configure']}
-- name: get service
-  shell: ls -l /usr/lib/systemd/system/
-  register: result
-
-- { include: set-service.yml, tags: ['configure']}
-- { include: update-api-server-service.yml, tags: ['configure']}
+# - { include: set-bin.yml, tags: ['bin']}
+- { include: 0_set-service.yml, tags: ['configure']}
+- { include: 1_update-api-server-service.yml, tags: ['update']}
+- { include: 2_setup_node.yml, tags: ['update']}
+- { include: 3_start-service.yml, tags: ['update']}

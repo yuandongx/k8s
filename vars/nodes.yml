@@ -1,0 +1,14 @@
+---
+nodes:
+  node1:
+    hostname: '192.168.48.128'
+    ansible_ssh_host: '192.168.48.128'
+    ansible_ssh_port: '22'
+    ansible_user: 'ubuntu'
+    ansible_password: 'ubuntu'
+  node2:
+    hostname: 'adbc'
+    ansible_ssh_host: '192.168.4.128'
+    ansible_ssh_port: '22'
+    ansible_user: 'ubuntu'
+    ansible_password: 'ubuntu'
