@@ -1,2 +1,3 @@
 ---
 # vars file for kubadm-install
+KUBERNETES_BINARY: /home/ubuntu/kube/kubernetes-server-linux-amd64.tar.gz

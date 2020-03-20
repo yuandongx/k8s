@@ -1,0 +1,94 @@
+
+# conntrack ebtables kubernetes-cni socat
+
+- name: state kube-source-binary
+  stat: path="{{KUBERNETES_BINARY}}"
+  register: sta
+  ignore_errors: true
+
+- name: mkdir tmp
+  shell: echo $HOME
+  register: home_info
+
+- name: mkdir tmp
+  tempfile:
+    prefix: k8s
+    path: "{{home_info.stdout}}"
+    state: directory
+  register: tmp_info
+
+- name: install kube local
+  block:
+
+    - name: chmod the tar 
+      file:
+        path: "{{KUBERNETES_BINARY}}"
+        mode: 0766
+
+    - name: unarchive file
+      shell: tar -zxvf "{{KUBERNETES_BINARY}}" -C "{{tmp_info.path }}/"
+
+    - name: copy bin to $HOME/.local/bin
+      shell: cp "{{tmp_info.path}}/kubernetes/server/bin/{{item}}" "/home/ubuntu/.local/bin/{{item}}"
+      loop:
+        - kubeadm
+        - kubelet
+        - kubectl
+
+    - name: load docker images
+      docker_image:
+        # name: localhost:5000/myimages/sinatra
+        # tag: v1
+        # push: yes
+        load_path: "{{tmp_info.path}}/kubernetes/server/bin/{{item}}"
+        source: load
+      loop:
+        - kube-scheduler.tar
+        - kube-controller-manager.tar
+        - kube-proxy.tar
+        - kube-apiserver.tar
+
+
+  always:
+    - name: remove tmp
+      file:
+        path: "{{tmp_info.path}}"
+        state: absent
+  become: yes
+  when: sta.stat.exists
+
+# - name: backup kube-source.list
+  # shell: cp /etc/apt/sources.list.d/kubernetes.list /etc/apt/sources.list.d/kubernetes.list.bak
+  # become: yes
+  # when:
+
+# - name: add kubernetes mirrors
+  # shell: echo "deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list
+  # become: yes
+
+# - block:
+  # - name: install k8s
+    # debug: msg="install k8s"
+
+  # - name: add kubernetes gpg
+    # shell: curl -fsSL https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add -
+    # become: yes
+
+  # - name: apt update
+    # apt:
+      # update_cache: yes
+    # become: yes
+
+  # - name: install kubelet kubectl kubeadm
+    # apt:
+      # name:
+        # - kubelet
+        # - kubectl
+
+  # - name: install kubeadm
+    # apt:
+      # name:
+        # - kubeadm
+    # delegate_to: api_server
+    # become: yes
+

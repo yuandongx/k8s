@@ -3,7 +3,7 @@
   hosts: k8s
 
   tasks:
-  # - import_role:
-      # name: kubadm-install
   - import_role:
-      name: kubadm-management
+      name: kubadm-install
+  # - import_role:
+      # name: kubadm-management
