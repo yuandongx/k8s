@@ -1,66 +1,64 @@
 ---
 # tasks file for kubadm-management
 
-# - name: get cpu count
-  # shell:  cat /proc/cpuinfo|egrep "processor[[:space:]]+:[[:space:]]+[[:digit:]]"| sort| uniq| wc -l
-  # register: cpu_info
+- name: get cpu count
+  shell:  cat /proc/cpuinfo|egrep "processor[[:space:]]+:[[:space:]]+[[:digit:]]"| sort| uniq| wc -l
+  register: cpu_info
 
-# - name: debug info
-  # debug: msg="image_repository={{image_repository}} service_subnet={{service_subnet}} advertise_address={{advertise_address}}"
+- name: debug info
+  debug: msg="image_repository={{image_repository}} service_subnet={{service_subnet}} advertise_address={{advertise_address}}"
 
-# - name: get home path
-  # shell: echo $HOME
-  # register: home_info
+- name: get home path
+  shell: echo $HOME
+  register: home_info
 
 
 - block:
-  # - name: create default init config
-    # template: src=kubeadm.conf.j2 dest=kubeadm.conf
+  - name: create default init config
+    template: src=kubeadm.conf.j2 dest=kubeadm.conf
 
-  # - name: swapoff -a
-    # shell: swapoff -a
-    # become: yes
+  - name: swapoff -a
+    shell: swapoff -a
+    become: yes
 
-  # - name: reset kubeadm
-    # shell: kubeadm reset --force
-    # become: yes
+  - name: reset kubeadm
+    shell: kubeadm reset --force
+    become: yes
 
-  # - name: start master
-    # shell: kubeadm init --config=kubeadm.conf
-    # register: start_info
-    # become: yes
+  - name: start master
+    shell: kubeadm init --config=kubeadm.conf
+    register: start_info
+    become: yes
 
   ## To start using your cluster, you need to run the following as a regular user
 
-  # - name: mkdir -p $HOME/.kube
-    # file:
-      # path: "{{home_info.stdout}}/.kube"
-      # state: directory
+  - name: mkdir -p $HOME/.kube
+    file:
+      path: "{{home_info.stdout}}/.kube"
+      state: directory
 
-  # - name: sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-    # shell: cp -i /etc/kubernetes/admin.conf "{{home_info.stdout}}/.kube/config"
-    # become: yes
+  - name: sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+    shell: cp -i /etc/kubernetes/admin.conf  "{{home_info.stdout}}/.kube/config"
+    become: yes
 
-  - name: copy
-    copy: 
-      src: /etc/kubernetes/admin.conf
-      # dest: "{{home_info.stdout}}/.kube/config"
-      dest: /home/ubuntu/.kube/config
+  - name: chown regular user
+    file: 
+      path: "{{home_info.stdout}}/.kube/config"
       owner: "{{default_user}}"
       group: "{{default_group}}"
     become: yes
     when: 'default_user is defined and default_user is defined'
 
-  # - name: sudo chown $(id -u):$(id -g) $HOME/.kube/config
-    # shell: sudo chown $(id -u):$(id -g) $HOME/.kube/config
-    # when: 'default_user is undefined and default_user is undefined'
+  - name: sudo chown $(id -u):$(id -g) $HOME/.kube/config
+    shell: sudo chown $(id -u):$(id -g) $HOME/.kube/config
+    when: 'default_user is undefined and default_user is undefined'
 
-  # - name: debug
-    # shell: echo "{{ start_info.stdout|regex_search('kubeadm join .+',multiline=True)|regex_replace('\\', '')}}" > "{{home_info.stdout}}/.kube/join.conf"
+  - name: debug
+    shell: echo "{{ start_info.stdout|regex_search('kubeadm join .+',multiline=True)|regex_replace('\\', '')}}" > "{{home_info.stdout}}/.kube/join.conf"
 
-  # when: type == "master"
-  # when: cpu_info.stdout > "1"
+  when: type == "master"
+  when: cpu_info.stdout > "1"
 
-# - name: cpu less than 1, failed.
-  # fail: msg="CPU number is {{cpu_info.stdout}}, less than 2. Can not startup k8s."
-  # when: cpu_info.stdout == "1"
+- name: cpu less than 1, failed.
+  fail: msg="CPU number is {{cpu_info.stdout}}, less than 2. Can not startup k8s."
+  when: cpu_info.stdout == "1"
