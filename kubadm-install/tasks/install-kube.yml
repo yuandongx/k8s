@@ -6,33 +6,39 @@
   register: sta
   ignore_errors: true
 
-- name: backup kube-source.list
-  shell: cp /etc/apt/sources.list.d/kubernetes.list /etc/apt/sources.list.d/kubernetes.list.bak
-  become: yes
-  when: sta.stat.exists
-
-- name: add kubernetes mirrors
-  shell: echo "deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list
-  become: yes
 
 - block:
+
+  - name: cat /etc/apt/sources.list.d/kubernetes.list
+    shell: cat /etc/apt/sources.list.d/kubernetes.list|grep "deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main"
+    register: src_info
+    when: sta.stat.exists
+
+  - name: add kubernetes mirrors
+    shell: echo "deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list
+    when: src_info.stdout == ""
+
+  - name: backup kube-source.list
+    shell: cp /etc/apt/sources.list.d/kubernetes.list /etc/apt/sources.list.d/kubernetes.list.bak
+    when: sta.stat.exists
+
   - name: install k8s
     debug: msg="install k8s"
 
   - name: add kubernetes gpg
     shell: curl -fsSL https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add -
-    become: yes
 
   - name: apt update
     apt:
       update_cache: yes
-    become: yes
 
   - name: install kubelet kubectl kubeadm
     apt:
       name:
         - kubelet
         - kubectl
+        - kubeadm
+  become: yes
 
   # - name: install kubeadm
     # apt:

@@ -1,5 +1,9 @@
 ---
 # defaults file for kubadm-management
 image_repository: "registry.cn-hangzhou.aliyuncs.com/xyd-2020"
-service_subnet: "192.168.150.0/24"
-advertise_address: "192.168.150.133"
+service_subnet: "172.128.0.0/24"
+advertise_address: "172.128.0.101"
+
+#To start using your cluster, you need to run the following as a regular user
+default_user: ubuntu 
+default_group: ubuntu

@@ -1,3 +1,7 @@
 ---
 # vars file for kubadm-install
 KUBERNETES_BINARY: /home/ubuntu/kube/kubernetes-server-linux-amd64.tar.gz
+REGISTRY_RUL: "registry.cn-hangzhou.aliyuncs.com"
+REGISTRY_NAME: "xyd-2020"
+REGISTRY_USERNAME: "786018072@qq.com"
+REGISTRY_PASSWORD: "xyd@12345"

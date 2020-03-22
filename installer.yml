@@ -1,0 +1,7 @@
+---
+- name: k8s
+  hosts: master
+
+  tasks:
+  - import_role:
+      name: kubadm-install

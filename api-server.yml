@@ -1,0 +1,9 @@
+---
+- name: k8s
+  hosts: master
+
+  tasks:
+  - include_role:
+      name: kubadm-management
+    vars:
+      type: master

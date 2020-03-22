@@ -1,6 +1,6 @@
 ---
 - name: k8s
-  hosts: k8s
+  hosts: master
 
   tasks:
   - import_role:
