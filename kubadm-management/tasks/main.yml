@@ -38,10 +38,10 @@
       state: directory
 
   - name: sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-    shell: cp -i /etc/kubernetes/admin.conf  "{{home_info.stdout}}/.kube/config"
+    shell: cp -f /etc/kubernetes/admin.conf  "{{home_info.stdout}}/.kube/config"
     become: yes
 
-  - name: chown regular user
+  - name: chown regular user.
     file: 
       path: "{{home_info.stdout}}/.kube/config"
       owner: "{{default_user}}"
