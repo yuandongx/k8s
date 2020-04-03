@@ -1,0 +1,36 @@
+---
+- name: Set OS distribution dependent variables
+  include_vars: nodes.yml
+
+# - name: setup nodes
+  # block:
+- name: Add a host alias that we reach through a tunnel (Ansible 1.9 and older)
+  add_host:
+    groups: nodes
+    hostname: "{{item.value.hostname}}"
+    ansible_ssh_host: "{{item.value.ansible_ssh_host}}"
+    ansible_ssh_port: "{{item.value.ansible_ssh_port}}"
+    ansible_user: "{{item.value.ansible_user}}"
+    ansible_password: "{{item.value.ansible_password}}"
+  loop: "{{nodes|dict2items}}"
+
+
+- name: copy bin
+  delegate_to: 192.168.48.128
+  copy: 
+      src: "{{bin_path_to}}/{{item}}"
+      dest: "/usr/local/bin/{{item}}"
+      mode: u=rwx,g=rx,o=rx
+  loop:
+    - kubelet
+    - kube-proxy
+
+- name: copy service
+  delegate_to: 192.168.48.128
+  copy: 
+      src: "service-tmp/{{item}}"
+      dest: "/lib/systemd/system/{{item}}"
+      mode: u=rwx,g=rx,o=rx
+  loop:
+    - kubelet.service
+    - kube-proxy.service

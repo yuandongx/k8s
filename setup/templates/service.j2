@@ -1,0 +1,35 @@
+[Unit]
+{% if description is defined %}
+Description={{ description }}
+{% endif %}
+Documentation=http://kubernetes.kansea.com/docs
+{% if after is defined %}
+After={{ after }}
+{% endif %}
+{% if wants is defined %}
+Wants={{ wants }}
+{% endif %}
+{% if requires is defined %}
+Requires={{ requires }}
+{% endif %}
+[Service]
+Type=notify
+{% if execstart is defined %}
+ExecStart={{ execstart }}
+{% endif %}
+{% if work_directory is defined %}
+WorkingDirectory={{ work_directory }}
+{% endif %}
+{% if execreload is defined %}
+ExecReload={{ execreload }}
+{% endif %}
+{% if timeout is defined %}
+TimeoutSec={{ timeout }}
+{% endif %}
+{% if restartsec is defined %}
+RestartSec={{ restartsec }}
+{% endif %}
+LimitNOFILE=65535
+Restart=on-failure
+[Install]
+WantedBy=multi-user.target
